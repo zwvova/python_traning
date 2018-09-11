@@ -34,6 +34,7 @@ def app(request):
 def db(request):
     db_config = load_config(request.config.getoption("--target"))['db']
     dbfixture = DbFixture(host=db_config['host'], name=db_config['name'], user=db_config['user'], password=db_config['password'])
+
     def fin():
         dbfixture.destroy()
     request.addfinalizer(fin)
@@ -64,14 +65,13 @@ def pytest_generate_tests(metafunc):
             metafunc.parametrize(fixture, testdata, ids=[str(x) for x in testdata])
 
 
-
 def load_from_module(module):
     return importlib.import_module("data.%s" % module).testdata
+
 
 def load_from_json(file):
     with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "data/%s.json" % file)) as f:
         return jsonpickle.decode(f.read())
-
 
 
 """config_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), request.config.getoption("--target"))
